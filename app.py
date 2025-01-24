@@ -72,7 +72,8 @@ def add_to_queue(student_id, R, Y, B):
 
     # Ensure total volume is 300 µL
     if R + Y + B != 300:
-        return {"Status": "Error", "Message": "The total R, Y, and B volume must be exactly 300 µL."}
+        yield {"Status": "Error", "Message": "The total R, Y, and B volume must be exactly 300 µL."}
+        return
     
     experiment_id = secrets.token_hex(4) 
 
