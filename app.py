@@ -116,12 +116,15 @@ def add_to_queue(student_id, R, Y, B):
             "RYB Volumes (µL)": {"R": R, "Y": Y, "B": B},
             "well":selected_well,
         }
-
+    
     # When processing starts
-    yield {"Status": "In Progress", "Message": "Experiment is running..."}
-
-    result = result_queue.get()  # This will block until the result is available
-    yield result  # Return the updated result to the Gradio interface
+    yield {"Status": "In Progress", "Message": "Experiment is running..."}  
+      
+    while True:
+        result = result_queue.get()  # This will block until the result is available
+        if result["Experiment ID"] == experiment_id:
+            yield result # Return the updated result to the Gradio interface
+            break
 
 # Start Task Processor Thread
 def task_processor():
