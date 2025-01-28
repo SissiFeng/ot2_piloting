@@ -5,13 +5,13 @@ import pandas as pd
 import os
 
 MONGODB_PASSWORD = os.getenv("MONGODB_PASSWORD")
-print(MONGODB_PASSWORD)
+print(f"MONGODB_PASSWORD: {MONGODB_PASSWORD}")
 blinded_connection_string = os.getenv("blinded_connection_string")
-print(blinded_connection_string)
+print(f"blinded_connection_string: {blinded_connection_string}")
 connection_string = blinded_connection_string.replace("<db_password>", MONGODB_PASSWORD)
-print(connection_string)
+print(f"Connection String: {connection_string}")
 
-@task
+
 def generate_empty_well():
     dbclient = MongoClient(connection_string)
     db = dbclient["LCM-OT-2-SLD"]  
@@ -35,7 +35,7 @@ def generate_empty_well():
     # close connection
     dbclient.close()
 
-@task 
+
 def update_used_wells(used_wells):
     dbclient = MongoClient(connection_string)
     db = dbclient["LCM-OT-2-SLD"]  
@@ -55,7 +55,7 @@ def update_used_wells(used_wells):
     # close connection
     dbclient.close()
 
-@task
+
 def find_unused_wells():
     dbclient = MongoClient(connection_string)
     db = dbclient["LCM-OT-2-SLD"]  
