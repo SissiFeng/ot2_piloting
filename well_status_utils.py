@@ -5,11 +5,11 @@ import pandas as pd
 import os
 
 MONGODB_PASSWORD = os.getenv("MONGODB_PASSWORD")
-print(f"MONGODB_PASSWORD: {MONGODB_PASSWORD}")
+
 blinded_connection_string = os.getenv("blinded_connection_string")
-print(f"blinded_connection_string: {blinded_connection_string}")
+
 connection_string = blinded_connection_string.replace("<db_password>", MONGODB_PASSWORD)
-print(f"Connection String: {connection_string}")
+
 
 
 def generate_empty_well():
