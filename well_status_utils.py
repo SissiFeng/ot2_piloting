@@ -1,4 +1,4 @@
-#from lambda_mongo_utils import send_data_to_mongodb
+
 from pymongo import MongoClient
 from prefect import task
 import pandas as pd
