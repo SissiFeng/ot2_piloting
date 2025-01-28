@@ -11,7 +11,7 @@ blinded_connection_string = os.getenv("blinded_connection_string")
 connection_string = blinded_connection_string.replace("<db_password>", MONGODB_PASSWORD)
 
 
-
+@task
 def generate_empty_well():
     dbclient = MongoClient(connection_string)
     db = dbclient["LCM-OT-2-SLD"]  
@@ -35,7 +35,7 @@ def generate_empty_well():
     # close connection
     dbclient.close()
 
-
+@task
 def update_used_wells(used_wells):
     dbclient = MongoClient(connection_string)
     db = dbclient["LCM-OT-2-SLD"]  
@@ -55,7 +55,7 @@ def update_used_wells(used_wells):
     # close connection
     dbclient.close()
 
-
+@task
 def find_unused_wells():
     dbclient = MongoClient(connection_string)
     db = dbclient["LCM-OT-2-SLD"]  
@@ -68,6 +68,7 @@ def find_unused_wells():
     if "well" not in df.columns:
         raise ValueError("The returned data does not contain the 'well' field.")
     # Sort obtained list
+    
     def well_sort_key(well):
         row = well[0]  # A, B, C, ...
         col = int(well[1:])  # 1, 2, ..., 12
