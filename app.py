@@ -8,6 +8,16 @@ import secrets
 from well_status_utils import find_unused_wells, update_used_wells
 
 
+
+import os
+
+MONGODB_PASSWORD = os.getenv("MONGODB_PASSWORD")
+print("MONGODB_PASSWORD" = MONGODB_PASSWORD)
+blinded_connection_string = os.getenv("blinded_connection_string")
+print("blinded_connection_string" = blinded_connection_string)
+connection_string = blinded_connection_string.replace("<db_password>", MONGODB_PASSWORD)
+print("connection_string" = connection_string)
+
 # Task Queue
 task_queue = Queue()
 result_queue = Queue()
