@@ -5,7 +5,7 @@ import pandas as pd
 from huggingface_hub import get_secret
 
 MONGODB_PASSWORD = get_secret("MONGODB_PASSWORD")
-blinded_connection_string = get_secret("MONGODB_CONN_STRING")
+blinded_connection_string = get_secret("blinded_connection_string")
 
 connection_string = blinded_connection_string.replace("<db_password>", MONGODB_PASSWORD)
 
