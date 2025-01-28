@@ -2,10 +2,11 @@
 from pymongo import MongoClient
 from prefect import task
 import pandas as pd
-from huggingface_hub import get_secret
 
-MONGODB_PASSWORD = get_secret("MONGODB_PASSWORD")
-blinded_connection_string = get_secret("blinded_connection_string")
+import os
+
+MONGODB_PASSWORD = os.getenv("MONGODB_PASSWORD")
+blinded_connection_string = os.getenv("blinded_connection_string")
 
 connection_string = blinded_connection_string.replace("<db_password>", MONGODB_PASSWORD)
 
