@@ -2,17 +2,11 @@
 from pymongo import MongoClient
 from prefect import task
 import pandas as pd
-#import os
+from huggingface_hub import get_secret
 
-#MONGODB_PASSWORD = os.getenv("MONGODB_PASSWORD")
+MONGODB_PASSWORD = get_secret("MONGODB_PASSWORD")
+blinded_connection_string = get_secret("MONGODB_CONN_STRING")
 
-MONGODB_PASSWORD = "84Zcbnk8oF9nRKVj"
-
-# Connection string obtained via MongoDB Atlas "Connect" button
-blinded_connection_string = "mongodb+srv://Neil-YL:<db_password>@lcm-ot2-sdl.4wik0.mongodb.net/?retryWrites=true&w=majority&appName=LCM-OT2-SDL"
-
-# Replace <password> with the MongoDB password (where again, the connection
-# string and password would normally be kept private)
 connection_string = blinded_connection_string.replace("<db_password>", MONGODB_PASSWORD)
 
 @task
