@@ -407,7 +407,7 @@ with gr.Blocks(title="OT-2 Liquid Color Matching Experiment Queue") as demo:
         inputs=[student_id_input, r_slider, y_slider, b_slider],
         outputs=result_output,
         api_name="submit",
-        concurrency_limit=3
+        concurrency_limit=5
     ).then(
         update_queue_display,
         None,
@@ -426,8 +426,8 @@ with gr.Blocks(title="OT-2 Liquid Color Matching Experiment Queue") as demo:
         queue_status
     )
 
-# NOTE: Left as-is, you have not used demo.queue(...) except for concurrency_limit on the .click
-demo.queue  # No changes here
+
+demo.queue 
 
 if __name__ == "__main__":
     demo.launch()
