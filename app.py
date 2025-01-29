@@ -355,7 +355,7 @@ def add_to_queue(student_id, R, Y, B):
 
 with gr.Blocks(title="OT-2 Liquid Color Matching Experiment Queue") as demo:
     gr.Markdown("## OT-2 Liquid Color Matching Experiment Queue")
-    gr.Markdown("Enter R, Y, and B volumes (in µL). Total volume must be exactly 300 µL.")
+    gr.Markdown("Enter R, Y, and B volumes (in µL). Total volume must not exceed 300 µL.(a volume of exactly 300 µL is recommended)")
     
     with gr.Row():
         with gr.Column(scale=2):
