@@ -246,9 +246,7 @@ def update_queue_display():
     """Refresh queue info for the UI"""
     global current_task, queue_counter
     try:
-        print(f"[DEBUG] Updating queue display - Counter: {queue_counter}")
-        print(f"[DEBUG] Current task: {current_task}")
-        
+        print(f"[DEBUG] Updating queue display - Counter: {queue_counter}")    
         if current_task:
             status = f"""### Current Queue Status
 - Active experiment: Yes
@@ -260,13 +258,11 @@ def update_queue_display():
 - Total experiments: {queue_counter}"""
         return status
     except Exception as e:
-        print(f"[DEBUG] Error in update_queue_display: {str(e)}")
         return f"Error getting queue status: {str(e)}"
 
 
 def add_to_queue(student_id, R, Y, B):
     global queue_counter
-    print(f"[DEBUG] Before adding - Queue counter: {queue_counter}")
     
     # Validate RYB inputs
     validation_result = validate_ryb_input(R, Y, B)
@@ -352,6 +348,57 @@ def add_to_queue(student_id, R, Y, B):
     result = result_queue.get()
     yield result
 
+def debug_experiment(student_id, R, Y, B):
+    if student_id != "debug":
+        return {"Status": "Error", "Message": "Invalid debug request"}
+        
+    experiment_id = "debug-" + secrets.token_hex(4)
+
+    yield {
+            "Status": "Queued",
+            "Position": debug, 
+            "Student ID": student_id,
+            "Experiment ID": experiment_id,
+            "Well": "DEBUG-A1",
+            "Volumes": {"R": R, "Y": Y, "B": B}
+        }
+        
+    time.sleep(5)
+
+    yield {
+            "Status": "Running",
+            "Student ID": student_id,
+            "Experiment ID": experiment_id,
+            "Well": "DEBUG-A1",
+            "Volumes": {"R": R, "Y": Y, "B": B}
+        }
+        
+    time.sleep(5)
+
+    yield {
+            "Status": "Complete",
+            "Message": "Debug mode - simulated result (no actual experiment performed)",
+            "Student ID": student_id,
+            "Command": {
+                "R": R,
+                "Y": Y,
+                "B": B,
+                "well": "DEBUG-A1"
+            },
+            "Sensor Data": {
+                "ch583": 2800,
+                "ch670": 3000,
+                "ch510": 1700,
+                "ch410": 240,
+                "ch620": 3900,
+                "ch470": 1000,
+                "ch550": 2400,
+                "ch440": 900
+            },
+            "Experiment ID": experiment_id
+        }
+    return
+    
 
 with gr.Blocks(title="OT-2 Liquid Color Matching Experiment Queue") as demo:
     gr.Markdown("## OT-2 Liquid Color Matching Experiment Queue")
@@ -417,13 +464,22 @@ with gr.Blocks(title="OT-2 Liquid Color Matching Experiment Queue") as demo:
     update_status_btn.click(
         update_queue_display,
         None,
-        queue_status
+        queue_status,
+        api_name="update_queue_display" 
     )
 
     demo.load(
         update_queue_display,
         None,
         queue_status
+    )
+
+    debug_btn = gr.Button("Debug Submit", visible=False) 
+    debug_btn.click(
+    debug_experiment,
+    inputs=[student_id_input, r_slider, y_slider, b_slider],
+    outputs=result_output,
+    api_name="debug" 
     )
 
 
