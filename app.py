@@ -337,7 +337,7 @@ def add_to_queue(student_id, R, Y, B):
     # NOTE: Wait until the task's status becomes 'processing'
     #       This ensures we only yield "Running" when the backend actually starts the job.
     while tasks_dict[(student_id, experiment_id)]["status"] == "queued":
-        time.sleep(15)
+        time.sleep(20)
     
     # Second yield: "Running" (happens only after status is 'processing')
     yield {
