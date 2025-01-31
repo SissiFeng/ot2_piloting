@@ -209,7 +209,6 @@ def verify_student_id(student_id):
     
     quota_remaining = check_student_quota(student_id)
     
-    print(f"[DEBUG] Updating status:  Queue counter: {queue_counter}")
     
     if quota_remaining <= 0:
         return [
@@ -259,6 +258,14 @@ def update_queue_display():
 
 def add_to_queue(student_id, R, Y, B):
     global queue_counter
+    
+    if student_id == "debug":
+        yield {
+            "Status": "Error", 
+            "Message": "Debug ID cannot submit to real experiment queue. Please use your student id to submit experiment."
+        }
+        return
+
     
     # Validate RYB inputs
     validation_result = validate_ryb_input(R, Y, B)
