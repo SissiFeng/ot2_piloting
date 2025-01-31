@@ -170,10 +170,6 @@ def task_processor():
 
             # NOTE: We retrieve the actual task from tasks_dict
             current_task = tasks_dict[(student_id, experiment_id)]
-
-            print(f"[DEBUG] Task processor - Getting new task. Queue counter: {queue_counter}")
-           
-            print(f"[DEBUG] Task start time: {task_start_time}")
             
             # Mark status as "processing"
             current_task["status"] = "processing"
@@ -356,7 +352,7 @@ def debug_experiment(student_id, R, Y, B):
 
     yield {
             "Status": "Queued",
-            "Position": debug, 
+            "Position": "debug", 
             "Student ID": student_id,
             "Experiment ID": experiment_id,
             "Well": "DEBUG-A1",
