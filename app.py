@@ -378,8 +378,7 @@ def debug_experiment(student_id, R, Y, B):
         }
         
     time.sleep(5)
-
-    yield {
+    result_debug = {
             "Status": "Complete",
             "Message": "Debug mode - simulated result (no actual experiment performed)",
             "Student ID": student_id,
@@ -401,7 +400,8 @@ def debug_experiment(student_id, R, Y, B):
             },
             "Experiment ID": experiment_id
         }
-    return
+
+    yield result_debug
     
 
 with gr.Blocks(title="OT-2 Liquid Color Matching Experiment Queue") as demo:
