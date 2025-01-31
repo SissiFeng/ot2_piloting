@@ -458,7 +458,7 @@ with gr.Blocks(title="OT-2 Liquid Color Matching Experiment Queue") as demo:
         inputs=[student_id_input, r_slider, y_slider, b_slider],
         outputs=result_output,
         api_name="submit",
-        concurrency_limit=5
+        concurrency_limit=8
     ).then(
         update_queue_display,
         None,
