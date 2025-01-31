@@ -245,12 +245,11 @@ def update_queue_display():
         if current_task:
             status = f"""### Current Queue Status
 - Active experiment: Yes
-- Queue length: {queue_counter} experiment(s)"""
+- Queue length: {queue_counter+1} experiment(s)"""
         else:
             status = f"""### Current Queue Status
 - Active experiment: No
-- Queue length: {queue_counter} experiment(s)
-- Total experiments: {queue_counter}"""
+- Queue length: {queue_counter} experiment(s)"""
         return status
     except Exception as e:
         return f"Error getting queue status: {str(e)}"
