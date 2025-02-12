@@ -1,0 +1,172 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "7860:7860"
+    environment:
+      - DEPLOYMENT_TYPE=app
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - PREFECT_API_URL=${PREFECT_API_URL}
+    depends_on:
+      - postgres
+      - mongodb
+      - prefect
+    networks:
+      - ot2-network
+
+  postgres:
+    image: postgres:14
+    environment:
+      - POSTGRES_USER=ot2admin
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=ot2db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - ot2-network
+
+  mongodb:
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=ot2admin
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - ot2-network
+
+  prefect:
+    image: prefecthq/prefect:2-latest
+    ports:
+      - "4200:4200"
+    environment:
+      - PREFECT_SERVER_API_HOST=0.0.0.0
+      - PREFECT_SERVER_API_PORT=4200
+    volumes:
+      - prefect_data:/root/.prefect
+    networks:
+      - ot2-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    networks:
+      - ot2-network
+
+  grafana:
+    image: grafana/grafana:latest
+    depends_on:
+      - prometheus
+      - postgres
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource,grafana-piechart-panel
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_AUTH_DISABLE_LOGIN_FORM=false
+    networks:
+      - ot2-network
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    environment:
+      - DATA_SOURCE_NAME=postgresql://ot2admin:${POSTGRES_PASSWORD}@postgres:5432/ot2db?sslmode=disable
+    ports:
+      - "9187:9187"
+    networks:
+      - ot2-network
+
+  mongodb-exporter:
+    image: percona/mongodb_exporter:latest
+    environment:
+      - MONGODB_URI=mongodb://ot2admin:${MONGODB_PASSWORD}@mongodb:27017
+    ports:
+      - "9216:9216"
+    command:
+      - '--collect-all'
+    networks:
+      - ot2-network
+
+  ml-service:
+    build:
+      context: ..
+      dockerfile: docker/ml.Dockerfile
+    environment:
+      - MODEL_PATH=/models
+    volumes:
+      - ml_models:/models
+
+  api-service:
+    build:
+      context: ..
+      dockerfile: docker/api.Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - app
+      - ml-service
+
+  web-ui:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-service
+
+  ot2-simulator:
+    build:
+      context: ..
+      dockerfile: docker/ot2-simulator.Dockerfile
+    environment:
+      - MQTT_BROKER=248cc294c37642359297f75b7b023374.s2.eu.hivemq.cloud
+      - MQTT_PORT=8883
+      - MQTT_USERNAME=sgbaird
+      - MQTT_PASSWORD=D.Pq5gYtejYbU#L
+    networks:
+      - ot2-network
+    depends_on:
+      - app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.socket().connect((os.environ['MQTT_BROKER'], int(os.environ['MQTT_PORT'])))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  ot2-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  prefect_data:
+  prometheus_data:
+  grafana_data:
+  ml_models: 

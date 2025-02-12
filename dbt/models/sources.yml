@@ -1,0 +1,40 @@
+version: 2
+
+sources:
+  - name: raw
+    database: ot2db
+    schema: public
+    tables:
+      - name: experiments
+        description: Raw experiment data
+        columns:
+          - name: id
+            description: Unique identifier for the experiment
+            tests:
+              - unique
+              - not_null
+          - name: user_id
+            description: ID of the user who created the experiment
+            tests:
+              - not_null
+          - name: status
+            description: Current status of the experiment
+            tests:
+              - accepted_values:
+                  values: ['pending', 'running', 'completed', 'failed', 'reviewed']
+
+      - name: wells
+        description: Raw well data
+        columns:
+          - name: id
+            description: Unique identifier for the well
+            tests:
+              - unique
+              - not_null
+          - name: experiment_id
+            description: ID of the associated experiment
+            tests:
+              - not_null
+              - relationships:
+                  to: ref('stg_experiments')
+                  field: experiment_id 

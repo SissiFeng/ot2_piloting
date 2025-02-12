@@ -1,0 +1,51 @@
+groups:
+  - name: ot2_alerts
+    rules:
+      - alert: HighExperimentFailureRate
+        expr: |
+          rate(ot2_experiments_total{status="failed"}[5m]) /
+          rate(ot2_experiments_total{status!="invalid"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High experiment failure rate
+          description: "Experiment failure rate is above 10% in the last 5 minutes"
+
+      - alert: LongRunningExperiment
+        expr: ot2_experiment_duration_seconds_bucket{le="+Inf"} > 300
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: Long running experiment detected
+          description: "An experiment has been running for more than 5 minutes"
+
+      - alert: DatabaseWriteLatencyHigh
+        expr: |
+          histogram_quantile(0.95, rate(ot2_db_write_latency_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High database write latency
+          description: "95th percentile of database write latency is above 1 second"
+
+      - alert: TooManyActiveExperiments
+        expr: ot2_active_experiments > 5
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: Too many active experiments
+          description: "More than 5 experiments are currently running"
+
+      - alert: DataInconsistencyDetected
+        expr: |
+          increase(ot2_data_inconsistency_total[15m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Data inconsistency detected
+          description: "Data inconsistency detected between PostgreSQL and MongoDB" 
